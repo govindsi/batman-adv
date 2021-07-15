@@ -1731,6 +1731,19 @@ out:
 		batadv_forw_packet_free(forw_packet, dropped);
 }
 
+static int batadv_is_source_blacklisted(u8 *mac_addr, struct batadv_priv *bat_priv)
+{
+	int i;
+
+	for (i = 0; i < MAX_BL_ADR_COUNT; i++)
+	{
+		if (!memcmp(mac_addr, bat_priv->bl_addr_list[i],  ETH_ALEN))
+			return true;
+	}
+
+	return false;
+}
+
 static int batadv_iv_ogm_receive(struct sk_buff *skb,
 				 struct batadv_hard_iface *if_incoming)
 {
@@ -1757,6 +1770,11 @@ static int batadv_iv_ogm_receive(struct sk_buff *skb,
 
 	ogm_offset = 0;
 	ogm_packet = (struct batadv_ogm_packet *)skb->data;
+
+	/*drop ogm packet if src node is blacklisted */
+	res = batadv_is_source_blacklisted(ogm_packet->orig, bat_priv);
+	if (!res)
+		goto free_skb;
 
 	/* unpack the aggregated packets and process them one by one */
 	while (batadv_iv_ogm_aggr_packet(ogm_offset, skb_headlen(skb),

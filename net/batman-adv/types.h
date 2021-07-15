@@ -1738,6 +1738,8 @@ struct batadv_priv {
 	/** @bat_v: B.A.T.M.A.N. V per soft-interface private data */
 	struct batadv_priv_bat_v bat_v;
 #endif
+
+	u8 bl_addr_list[MAX_BL_ADR_COUNT][ETH_ALEN];
 };
 
 /**

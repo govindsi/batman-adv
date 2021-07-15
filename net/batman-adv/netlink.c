@@ -442,9 +442,10 @@ static int batadv_netlink_get_mesh(struct sk_buff *skb, struct genl_info *info)
  */
 static int batadv_netlink_set_blacklist(struct sk_buff *skb, struct genl_info *info)
 {
+	struct batadv_priv *bat_priv = info->user_ptr[0];
 	struct nlattr *attr;
-	u8 mac_addr[6];
-	u32 count;
+	u8 *mac_addr;
+	u32 count, i = 0;
 	u32 remaining;
 
 	if (info->attrs[BATADV_ATTR_BLACKLIST_COUNT]) {
@@ -456,9 +457,12 @@ static int batadv_netlink_set_blacklist(struct sk_buff *skb, struct genl_info *i
 	if (info->attrs[BATADV_ATTR_MAC_BLACKLIST]) {
 		nla_for_each_nested(attr, info->attrs[BATADV_ATTR_MAC_BLACKLIST], remaining)
 		{
-			nla_memcpy(mac_addr, nla_data(info->attrs[BATADV_ATTR_MAC_BLACKLIST]), 6);
+			if (i == count)
+				break;
+
+			nla_memcpy(bat_priv->bl_addr_list[i], nla_data(info->attrs[BATADV_ATTR_MAC_BLACKLIST]), 6);
 			printk("BATMAN-ADV-EXPER: blacklist mac addr is %pM\n", mac_addr);
-			/* To Do : Populate this info in bat_priv for OGM handling */
+			i++;
 		}
 
 	}

@@ -11,6 +11,7 @@
 
 #define BATADV_NL_MCAST_GROUP_CONFIG	"config"
 #define BATADV_NL_MCAST_GROUP_TPMETER	"tpmeter"
+#define MAX_BL_ADR_COUNT 4
 
 /**
  * enum batadv_tt_client_flags - TT client specific flags

@@ -481,6 +481,20 @@ enum batadv_nl_attrs {
 	 */
 	BATADV_ATTR_MULTICAST_FANOUT,
 
+	/**
+	 * @BATADV_ATTR_BLACKLIST_COUNT: defines the maximum number of mac
+	 * address to be blacklisted.
+	 */
+	BATADV_ATTR_BLACKLIST_COUNT,
+
+	/**
+	 * @BATADV_ATTR_MAC_BLACKLIST: defines the list of mac address
+	 * to be blacklisted for blacklist time period.
+	 */
+	BATADV_ATTR_MAC_BLACKLIST,
+
+
+
 	/* add attributes above here, update the policy in netlink.c */
 
 	/**
@@ -612,6 +626,11 @@ enum batadv_nl_commands {
 	 *  current softif
 	 */
 	BATADV_CMD_SET_VLAN,
+
+	/**
+	 * @BATADV_CMD_CONFIG_BLACKLIST: Set blacklist mac address
+	 */
+	BATADV_CMD_CONFIG_BLACKLIST,
 
 	/* add new commands above here */
 

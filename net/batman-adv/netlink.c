@@ -151,6 +151,8 @@ static const struct nla_policy batadv_netlink_policy[NUM_BATADV_ATTR] = {
 	[BATADV_ATTR_ORIG_INTERVAL]		= { .type = NLA_U32 },
 	[BATADV_ATTR_ELP_INTERVAL]		= { .type = NLA_U32 },
 	[BATADV_ATTR_THROUGHPUT_OVERRIDE]	= { .type = NLA_U32 },
+	[BATADV_ATTR_BLACKLIST_COUNT]	        = { .type = NLA_U32 },
+	[BATADV_ATTR_MAC_BLACKLIST]	        = { .type = NLA_UNSPEC, .len = 6 },
 };
 
 /**
@@ -429,6 +431,39 @@ static int batadv_netlink_get_mesh(struct sk_buff *skb, struct genl_info *info)
 	ret = genlmsg_reply(msg, info);
 
 	return ret;
+}
+
+/**
+ * batadv_netlink_set_blacklist,() - Set blacklist mac list
+ * @skb: Netlink message with request data
+ * @info: receiver information
+ *
+ * Return: 0 on success or negative error number in case of failure
+ */
+static int batadv_netlink_set_blacklist(struct sk_buff *skb, struct genl_info *info)
+{
+	struct nlattr *attr;
+	u8 mac_addr[6];
+	u32 count;
+	u32 remaining;
+
+	if (info->attrs[BATADV_ATTR_BLACKLIST_COUNT]) {
+		attr = info->attrs[BATADV_ATTR_BLACKLIST_COUNT];
+		count = nla_get_u32(attr);
+		printk("BATMAN-ADV-EXPER: black list count is %d", count);
+	}
+
+	if (info->attrs[BATADV_ATTR_MAC_BLACKLIST]) {
+		nla_for_each_nested(attr, info->attrs[BATADV_ATTR_MAC_BLACKLIST], remaining)
+		{
+			nla_memcpy(mac_addr, nla_data(info->attrs[BATADV_ATTR_MAC_BLACKLIST]), 6);
+			printk("BATMAN-ADV-EXPER: blacklist mac addr is %pM\n", mac_addr);
+			/* To Do : Populate this info in bat_priv for OGM handling */
+		}
+
+	}
+
+	return 0;
 }
 
 /**
@@ -1480,6 +1515,13 @@ static const struct genl_small_ops batadv_netlink_ops[] = {
 		.doit = batadv_netlink_set_vlan,
 		.internal_flags = BATADV_FLAG_NEED_MESH |
 				  BATADV_FLAG_NEED_VLAN,
+	},
+	{
+		.cmd = BATADV_CMD_CONFIG_BLACKLIST,
+		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
+		.flags = GENL_ADMIN_PERM,
+		.doit = batadv_netlink_set_blacklist,
+		.internal_flags = BATADV_FLAG_NEED_MESH,
 	},
 };
 
